@@ -115,9 +115,9 @@ extension ConnectionManager : MCSessionDelegate {
 
 extension ConnectionManager : StreamDelegate {
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
-        if let input = aStream as? InputStream, let sender = inputStreams.first(where: { $1 == input })?.0, input.hasBytesAvailable {
-            var bytes = [UInt8](repeating: 0, count: 1024)
-            let len = input.read(&bytes, maxLength: 1024)
+        if let input = aStream as? InputStream, let sender = inputStreams.first(where: { $1 == input })?.0, eventCode == .hasBytesAvailable {
+            var bytes = [UInt8](repeating: 0, count: 256)
+            let len = input.read(&bytes, maxLength: 256)
             bytes = Array(bytes[len-24..<len])
             
             let position = SCNVector3(fromBytes: Array(bytes[0..<12]))
