@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import ARKit
 import MultipeerConnectivity
 
 class ConnectionManager : NSObject {
@@ -50,11 +51,11 @@ class ConnectionManager : NSObject {
         NSLog("%@", "sending data: \(data) to \(session.connectedPeers.count) peers")
         
         for (_, stream) in outputStreams {
-            let archive = NSKeyedArchiver.archivedData(withRootObject: data)
-            archive.withUnsafeBytes {
-                stream.write($0, maxLength: archive.count)
+            if let location = data[.location] as? SCNVector3,
+                let eulers = data[.eulers] as? SCNVector3 {
+                let bytes = location.toBytes() + eulers.toBytes()
+                stream.write(bytes, maxLength: 24)
             }
-            stream.write([UInt8](archive), maxLength: 1024)
         }
     }
 }
@@ -115,19 +116,14 @@ extension ConnectionManager : MCSessionDelegate {
 extension ConnectionManager : StreamDelegate {
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
         if let input = aStream as? InputStream, let sender = inputStreams.first(where: { $1 == input })?.0, input.hasBytesAvailable {
-            var bytes = [UInt8](repeating: 0, count: 1024)
-            input.read(&bytes, maxLength: 1024)
-            let data = Data(bytes: bytes)
-            
-            if let rawData = NSKeyedUnarchiver.unarchiveObject(with: data) as? [String: Any] {
-                NSLog("%@", "unarchived: \(rawData)")
-                OperationQueue.main.addOperation {
-                    self.delegate?.dataChanged(manager: self, data: rawData,
-                                               fromPeer: sender.displayName)
-                }
-            } else {
-                print("Can't unarchive data \(data)")
-            }
+            var bytes = [UInt8](repeating: 0, count: 24)
+            input.read(&bytes, maxLength: 24)
+            let position = SCNVector3(fromBytes: Array(bytes[0..<12]))
+            let eulers = SCNVector3(fromBytes: Array(bytes[12..<24]))
+            self.delegate?.dataChanged(manager: self,
+                                       data: [.location: position,
+                                              .eulers : eulers],
+                                       fromPeer: sender.displayName)
         }
     }
 }

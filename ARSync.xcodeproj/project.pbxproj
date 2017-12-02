@@ -15,6 +15,7 @@
 		158F94231FD297B2004C9BE4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 158F94211FD297B2004C9BE4 /* LaunchScreen.storyboard */; };
 		158F942C1FD29828004C9BE4 /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158F942A1FD29828004C9BE4 /* ConnectionManager.swift */; };
 		158F942D1FD29828004C9BE4 /* ConnectionManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158F942B1FD29828004C9BE4 /* ConnectionManagerDelegate.swift */; };
+		158F94311FD2D5CD004C9BE4 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158F94301FD2D5CD004C9BE4 /* Utils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		158F94241FD297B2004C9BE4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		158F942A1FD29828004C9BE4 /* ConnectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
 		158F942B1FD29828004C9BE4 /* ConnectionManagerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionManagerDelegate.swift; sourceTree = "<group>"; };
+		158F94301FD2D5CD004C9BE4 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +71,7 @@
 				158F941F1FD297B2004C9BE4 /* Assets.xcassets */,
 				158F94211FD297B2004C9BE4 /* LaunchScreen.storyboard */,
 				158F94241FD297B2004C9BE4 /* Info.plist */,
+				158F94301FD2D5CD004C9BE4 /* Utils.swift */,
 			);
 			path = ARSync;
 			sourceTree = "<group>";
@@ -146,6 +149,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				158F94311FD2D5CD004C9BE4 /* Utils.swift in Sources */,
 				158F942D1FD29828004C9BE4 /* ConnectionManagerDelegate.swift in Sources */,
 				158F941B1FD297B2004C9BE4 /* ViewController.swift in Sources */,
 				158F942C1FD29828004C9BE4 /* ConnectionManager.swift in Sources */,

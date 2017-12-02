@@ -13,6 +13,7 @@ import ARKit
 typealias Message = String
 extension Message {
     static let location = "location"
+    static let eulers = "eulers"
 }
 
 class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
@@ -65,14 +66,18 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     }
     
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
+        counter += 1
         broadcastMyLocation()
     }
     
     func broadcastMyLocation() {
-        if let location = sceneView.pointOfView?.position {
-            connection.send(data: [.location : location])
+        if let pov = sceneView.pointOfView, counter % 2 == 0 {
+            connection.send(data: [.location : pov.position,
+                                   .eulers : pov.eulerAngles])
         }
     }
+    
+    var counter = 0
 }
 
 extension ViewController: ConnectionManagerDelegate {
@@ -89,10 +94,12 @@ extension ViewController: ConnectionManagerDelegate {
     }
     
     func dataChanged(manager: ConnectionManager, data: [String : Any], fromPeer: String) {
-        if let location = data[.location] as? SCNVector3 {
+        if let location = data[.location] as? SCNVector3,
+            let eulers = data[.eulers] as? SCNVector3 {
             if let node = sceneView.scene.rootNode.childNode(withName: fromPeer,
                                                              recursively: false) {
                 node.position = location
+                node.eulerAngles = eulers
             } else {
                 addNodeForDevice(fromPeer, position: location)
             }
@@ -102,7 +109,7 @@ extension ViewController: ConnectionManagerDelegate {
     func addNodeForDevice(_ device: String, position: SCNVector3? = nil) {
         let node = SCNNode()
         node.name = device
-        node.geometry = SCNSphere(radius: 0.02)
+        node.geometry = SCNBox(width: 0.1, height: 0.3, length: 0.03, chamferRadius: 0)
         node.geometry?.firstMaterial?.diffuse.contents = UIColor.red.withAlphaComponent(0.7)
         node.geometry?.firstMaterial?.isDoubleSided = true
         node.position = position ?? SCNVector3Zero
