@@ -27,6 +27,8 @@ class ConnectionManager : NSObject {
         return session
     }()
     
+    var outputStreams: [MCPeerID : OutputStream] = [:]
+    var inputStreams: [MCPeerID : InputStream] = [:]
     
     override init() {
         self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: serviceType)
@@ -44,21 +46,16 @@ class ConnectionManager : NSObject {
         self.serviceBrowser.stopBrowsingForPeers()
     }
     
-    
     func send(data : [String: Any]) {
         NSLog("%@", "sending data: \(data) to \(session.connectedPeers.count) peers")
         
-        if session.connectedPeers.count > 0 {
-            do {
-                let archive = NSKeyedArchiver.archivedData(withRootObject: data)
-                try self.session.send(archive,
-                                      toPeers: session.connectedPeers,
-                                      with: .unreliable)
-            } catch let error {
-                NSLog("%@", "Error for sending: \(error)")
+        for (_, stream) in outputStreams {
+            let archive = NSKeyedArchiver.archivedData(withRootObject: data)
+            archive.withUnsafeBytes {
+                stream.write($0, maxLength: archive.count)
             }
+            stream.write([UInt8](archive), maxLength: 1024)
         }
-        
     }
 }
 
@@ -66,6 +63,18 @@ extension ConnectionManager : MCSessionDelegate {
     
     func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         NSLog("%@", "peer \(peerID) didChangeState: \(state)")
+        
+        if state == .connected {
+            let id = "\(myPeerId.displayName)-\(peerID.displayName)"
+            if let stream = try? session.startStream(withName: id, toPeer: peerID) {
+                stream.schedule(in: RunLoop.main, forMode: .defaultRunLoopMode)
+                outputStreams[peerID] = stream
+                stream.open()
+            }
+        } else if state == .notConnected {
+            outputStreams[peerID]?.close()
+            outputStreams[peerID] = nil
+        }
         
         OperationQueue.main.addOperation {
             self.delegate?.connectedDevicesChanged(manager: self, connectedDevices:
@@ -88,6 +97,10 @@ extension ConnectionManager : MCSessionDelegate {
     
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
         NSLog("%@", "didReceiveStream")
+        inputStreams[peerID] = stream
+        stream.schedule(in: RunLoop.main, forMode: .defaultRunLoopMode)
+        stream.delegate = self
+        stream.open()
     }
     
     func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
@@ -97,7 +110,26 @@ extension ConnectionManager : MCSessionDelegate {
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
         NSLog("%@", "didFinishReceivingResourceWithName")
     }
-    
+}
+
+extension ConnectionManager : StreamDelegate {
+    func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
+        if let input = aStream as? InputStream, let sender = inputStreams.first(where: { $1 == input })?.0, input.hasBytesAvailable {
+            var bytes = [UInt8](repeating: 0, count: 1024)
+            input.read(&bytes, maxLength: 1024)
+            let data = Data(bytes: bytes)
+            
+            if let rawData = NSKeyedUnarchiver.unarchiveObject(with: data) as? [String: Any] {
+                NSLog("%@", "unarchived: \(rawData)")
+                OperationQueue.main.addOperation {
+                    self.delegate?.dataChanged(manager: self, data: rawData,
+                                               fromPeer: sender.displayName)
+                }
+            } else {
+                print("Can't unarchive data \(data)")
+            }
+        }
+    }
 }
 
 extension ConnectionManager : MCNearbyServiceAdvertiserDelegate {
