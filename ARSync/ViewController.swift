@@ -10,8 +10,7 @@ import UIKit
 import SceneKit
 import ARKit
 
-typealias Message = String
-extension Message {
+extension String {
     static let location = "location"
 }
 
@@ -66,10 +65,16 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         broadcastMyLocation()
+        counter += 1
     }
     
+    let broadcastFPS = 3
+    var counter = 0
+    
     func broadcastMyLocation() {
-        if let location = sceneView.pointOfView?.position {
+        
+        if let location = sceneView.pointOfView?.position,
+            counter % broadcastFPS == 0 {
             connection.send(data: [.location : location])
         }
     }

@@ -15,6 +15,7 @@
 		158F94231FD297B2004C9BE4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 158F94211FD297B2004C9BE4 /* LaunchScreen.storyboard */; };
 		158F942C1FD29828004C9BE4 /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158F942A1FD29828004C9BE4 /* ConnectionManager.swift */; };
 		158F942D1FD29828004C9BE4 /* ConnectionManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158F942B1FD29828004C9BE4 /* ConnectionManagerDelegate.swift */; };
+		158F942F1FD2C2C2004C9BE4 /* CodableExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158F942E1FD2C2C2004C9BE4 /* CodableExtensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		158F94241FD297B2004C9BE4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		158F942A1FD29828004C9BE4 /* ConnectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
 		158F942B1FD29828004C9BE4 /* ConnectionManagerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionManagerDelegate.swift; sourceTree = "<group>"; };
+		158F942E1FD2C2C2004C9BE4 /* CodableExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableExtensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +67,7 @@
 				158F941A1FD297B2004C9BE4 /* ViewController.swift */,
 				158F942A1FD29828004C9BE4 /* ConnectionManager.swift */,
 				158F942B1FD29828004C9BE4 /* ConnectionManagerDelegate.swift */,
+				158F942E1FD2C2C2004C9BE4 /* CodableExtensions.swift */,
 				158F941C1FD297B2004C9BE4 /* Main.storyboard */,
 				158F941F1FD297B2004C9BE4 /* Assets.xcassets */,
 				158F94211FD297B2004C9BE4 /* LaunchScreen.storyboard */,
@@ -148,6 +151,7 @@
 			files = (
 				158F942D1FD29828004C9BE4 /* ConnectionManagerDelegate.swift in Sources */,
 				158F941B1FD297B2004C9BE4 /* ViewController.swift in Sources */,
+				158F942F1FD2C2C2004C9BE4 /* CodableExtensions.swift in Sources */,
 				158F942C1FD29828004C9BE4 /* ConnectionManager.swift in Sources */,
 				158F94171FD297B2004C9BE4 /* AppDelegate.swift in Sources */,
 			);

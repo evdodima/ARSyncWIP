@@ -7,7 +7,13 @@
 //
 
 import Foundation
+import ARKit
 import MultipeerConnectivity
+
+//struct Message: Codable {
+//    let name : String
+//    let payload : Codable
+//}
 
 class ConnectionManager : NSObject {
     
@@ -44,14 +50,15 @@ class ConnectionManager : NSObject {
         self.serviceBrowser.stopBrowsingForPeers()
     }
     
-    
-    func send(data : [String: Any]) {
+    let encoder = JSONEncoder()
+    let decoder = JSONDecoder()
+
+    func send(data : [String: SCNVector3]) {
         NSLog("%@", "sending data: \(data) to \(session.connectedPeers.count) peers")
         
         if session.connectedPeers.count > 0 {
             do {
-                let archive = NSKeyedArchiver.archivedData(withRootObject: data)
-                try self.session.send(archive,
+                try self.session.send(try encoder.encode(data),
                                       toPeers: session.connectedPeers,
                                       with: .unreliable)
             } catch let error {
@@ -75,14 +82,17 @@ extension ConnectionManager : MCSessionDelegate {
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         NSLog("%@", "didReceiveData: \(data)")
-        if let rawData = NSKeyedUnarchiver.unarchiveObject(with: data) as? [String: Any] {
+        
+        do {
+            let rawData = try decoder.decode([String: SCNVector3].self, from: data)
             NSLog("%@", "unarchived: \(rawData)")
             OperationQueue.main.addOperation {
+                debugPrint(rawData)
                 self.delegate?.dataChanged(manager: self, data: rawData,
                                            fromPeer: peerID.displayName)
             }
-        } else {
-            print("Can't unarchive data \(data)")
+        } catch let error {
+            print("Can't unarchive data \(data) \(error)")
         }
     }
     
