@@ -14,7 +14,7 @@ class ConnectionManager : NSObject {
     
     // Service type must be a unique string, at most 15 characters long
     // and can contain only ASCII lowercase letters, numbers and hyphens.
-    private let serviceType = "ARSync"
+    private let serviceType = "arsync"
     
     private let myPeerId = MCPeerID(displayName: UIDevice.current.name)
     private let serviceAdvertiser : MCNearbyServiceAdvertiser
@@ -23,11 +23,14 @@ class ConnectionManager : NSObject {
     var delegate : ConnectionManagerDelegate?
     
     lazy var session : MCSession = {
-        let session = MCSession(peer: self.myPeerId, securityIdentity: nil, encryptionPreference: .required)
+        let session = MCSession(peer: self.myPeerId,
+                                securityIdentity: nil,
+                                encryptionPreference: .none)
         session.delegate = self
         return session
     }()
     
+    var queues: [MCPeerID : OperationQueue] = [:]
     var outputStreams: [MCPeerID : OutputStream] = [:]
     var inputStreams: [MCPeerID : InputStream] = [:]
     
@@ -50,11 +53,14 @@ class ConnectionManager : NSObject {
     func send(data : [String: Any]) {
         NSLog("%@", "sending data: \(data) to \(session.connectedPeers.count) peers")
         
-        for (_, stream) in outputStreams {
+        for (id, stream) in outputStreams {
             if let location = data[.location] as? SCNVector3,
-                let eulers = data[.eulers] as? SCNVector3 {
-                let bytes = location.toBytes() + eulers.toBytes()
-                stream.write(bytes, maxLength: 24)
+                let eulers = data[.eulers] as? SCNVector3,
+                let queue = queues[id] {
+                do {
+                    let bytes = location.toBytes() + eulers.toBytes()
+                    stream.write(bytes, maxLength: 24)
+                }
             }
         }
     }
@@ -71,10 +77,13 @@ extension ConnectionManager : MCSessionDelegate {
                 stream.schedule(in: RunLoop.main, forMode: .defaultRunLoopMode)
                 outputStreams[peerID] = stream
                 stream.open()
+                
+                queues[peerID] = OperationQueue()
             }
         } else if state == .notConnected {
             outputStreams[peerID]?.close()
             outputStreams[peerID] = nil
+            queues[peerID] = nil
         }
         
         OperationQueue.main.addOperation {
@@ -115,17 +124,27 @@ extension ConnectionManager : MCSessionDelegate {
 
 extension ConnectionManager : StreamDelegate {
     func stream(_ aStream: Stream, handle eventCode: Stream.Event) {
-        if let input = aStream as? InputStream, let sender = inputStreams.first(where: { $1 == input })?.0, eventCode == .hasBytesAvailable {
-            var bytes = [UInt8](repeating: 0, count: 256)
-            let len = input.read(&bytes, maxLength: 256)
-            bytes = Array(bytes[len-24..<len])
-            
-            let position = SCNVector3(fromBytes: Array(bytes[0..<12]))
-            let eulers = SCNVector3(fromBytes: Array(bytes[12..<24]))
-            self.delegate?.dataChanged(manager: self,
-                                       data: [.location: position,
-                                              .eulers : eulers],
-                                       fromPeer: sender.displayName)
+        do {
+            if let input = aStream as? InputStream, let sender = self.inputStreams.first(where: { $1 == input })?.0,
+                eventCode == .hasBytesAvailable {
+                
+                do {
+                    
+                    
+                    
+                        var bytes = [UInt8](repeating: 0, count: 256)
+                        let len = input.read(&bytes, maxLength: 256)
+                        bytes = Array(bytes[len-24..<len])
+                    
+                        let position = SCNVector3(fromBytes: Array(bytes[0..<12]))
+                        let eulers = SCNVector3(fromBytes: Array(bytes[12..<24]))
+                    
+                        self.delegate?.dataChanged(manager: self,
+                                                   data: [.location: position,
+                                                          .eulers : eulers],
+                                                   fromPeer: sender.displayName)
+                }
+            }
         }
     }
 }
