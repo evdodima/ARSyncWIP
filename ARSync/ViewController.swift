@@ -82,6 +82,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
 
 
 extension ViewController: ConnectionManagerDelegate {
+    
+    
     func connectedDevicesChanged(manager: ConnectionManager, connectedDevices: [String]) {
         print(connectedDevices)
         connectedDevicesLabel.text = connectedDevices.description
@@ -111,7 +113,7 @@ extension ViewController: ConnectionManagerDelegate {
         }
     }
     
-    func eventRecieved(manager: ConnectionManager, event: [Int : Any], fromPeer: String) {
+    func eventRecieved(manager: ConnectionManager, event: Event, fromPeer: String) {
         
     }
     

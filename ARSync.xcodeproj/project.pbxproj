@@ -16,6 +16,8 @@
 		158F942C1FD29828004C9BE4 /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158F942A1FD29828004C9BE4 /* ConnectionManager.swift */; };
 		158F942D1FD29828004C9BE4 /* ConnectionManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158F942B1FD29828004C9BE4 /* ConnectionManagerDelegate.swift */; };
 		158F94311FD2D5CD004C9BE4 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158F94301FD2D5CD004C9BE4 /* Utils.swift */; };
+		8EFDB1351FE2DC58006C8AED /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EFDB1341FE2DC58006C8AED /* Event.swift */; };
+		8EFDB1371FE2E197006C8AED /* CodableExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EFDB1361FE2E197006C8AED /* CodableExtensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +32,8 @@
 		158F942A1FD29828004C9BE4 /* ConnectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
 		158F942B1FD29828004C9BE4 /* ConnectionManagerDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionManagerDelegate.swift; sourceTree = "<group>"; };
 		158F94301FD2D5CD004C9BE4 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		8EFDB1341FE2DC58006C8AED /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		8EFDB1361FE2E197006C8AED /* CodableExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableExtensions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +76,8 @@
 				158F94211FD297B2004C9BE4 /* LaunchScreen.storyboard */,
 				158F94241FD297B2004C9BE4 /* Info.plist */,
 				158F94301FD2D5CD004C9BE4 /* Utils.swift */,
+				8EFDB1341FE2DC58006C8AED /* Event.swift */,
+				8EFDB1361FE2E197006C8AED /* CodableExtensions.swift */,
 			);
 			path = ARSync;
 			sourceTree = "<group>";
@@ -153,7 +159,9 @@
 				158F942D1FD29828004C9BE4 /* ConnectionManagerDelegate.swift in Sources */,
 				158F941B1FD297B2004C9BE4 /* ViewController.swift in Sources */,
 				158F942C1FD29828004C9BE4 /* ConnectionManager.swift in Sources */,
+				8EFDB1351FE2DC58006C8AED /* Event.swift in Sources */,
 				158F94171FD297B2004C9BE4 /* AppDelegate.swift in Sources */,
+				8EFDB1371FE2E197006C8AED /* CodableExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

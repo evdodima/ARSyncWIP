@@ -65,7 +65,21 @@ class ConnectionManager : NSObject {
         }
     }
     
-    func sendEvent(data : [Int: Any]) {
+    let encoder = JSONEncoder()
+    let decoder = JSONDecoder()
+    
+    func sendEvent(event: Event) {
+        NSLog("%@", "sending data: \(event) to \(session.connectedPeers.count) peers")
+        
+        if session.connectedPeers.count > 0 {
+            do {
+                try self.session.send(try encoder.encode(event),
+                                      toPeers: session.connectedPeers,
+                                      with: .unreliable)
+            } catch let error {
+                NSLog("%@", "Error for sending: \(error)")
+            }
+        }
         
     }
 }
@@ -97,15 +111,15 @@ extension ConnectionManager : MCSessionDelegate {
     }
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        NSLog("%@", "didReceiveData: \(data)")
-        if let rawData = NSKeyedUnarchiver.unarchiveObject(with: data) as? [Int: Any] {
-            NSLog("%@", "unarchived: \(rawData)")
+        do {
+            let event = try decoder.decode(Event.self, from: data)
+            NSLog("%@", "unarchived: \(event)")
             OperationQueue.main.addOperation {
-                self.delegate?.eventRecieved(manager: self, event: rawData,
-                                           fromPeer: peerID.displayName)
+                debugPrint(event)
+                self.delegate?.eventRecieved(manager: self, event: event, fromPeer: peerID.displayName)
             }
-        } else {
-            print("Can't unarchive data \(data)")
+        } catch let error {
+            print("Can't unarchive data \(data) \(error)")
         }
     }
     
