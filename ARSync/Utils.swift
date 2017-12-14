@@ -9,6 +9,17 @@
 import Foundation
 import ARKit
 
+typealias Message = Int
+extension Message {
+    static let location = 0
+    static let eulers = 1
+    static let addNode = 2
+    static let updateNode = 3
+    static let removeNode = 4
+
+
+}
+
 func fromByteArray<T>(_ value: [UInt8], _: T.Type) -> T {
     return value.withUnsafeBufferPointer {
         $0.baseAddress!.withMemoryRebound(to: T.self, capacity: 1) {

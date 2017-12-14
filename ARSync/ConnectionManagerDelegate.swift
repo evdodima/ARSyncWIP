@@ -10,5 +10,7 @@ protocol ConnectionManagerDelegate {
     
     func connectedDevicesChanged(manager : ConnectionManager, connectedDevices: [String])
     
-    func dataChanged(manager : ConnectionManager, data: [String: Any], fromPeer: String)
+    func eventRecieved(manager : ConnectionManager, event: [Int: Any], fromPeer: String)
+    
+    func updateFromStream(manager : ConnectionManager, data: [Int: Any], fromPeer: String)
 }

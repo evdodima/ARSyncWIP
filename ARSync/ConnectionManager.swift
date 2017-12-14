@@ -49,8 +49,8 @@ class ConnectionManager : NSObject {
         self.serviceAdvertiser.stopAdvertisingPeer()
         self.serviceBrowser.stopBrowsingForPeers()
     }
-    
-    func send(data : [String: Any]) {
+    func sendToStreams(data: [Int:Any]) {
+        
         NSLog("%@", "sending data: \(data) to \(session.connectedPeers.count) peers")
         
         for (id, stream) in outputStreams {
@@ -63,6 +63,10 @@ class ConnectionManager : NSObject {
                 }
             }
         }
+    }
+    
+    func sendEvent(data : [Int: Any]) {
+        
     }
 }
 
@@ -94,10 +98,10 @@ extension ConnectionManager : MCSessionDelegate {
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         NSLog("%@", "didReceiveData: \(data)")
-        if let rawData = NSKeyedUnarchiver.unarchiveObject(with: data) as? [String: Any] {
+        if let rawData = NSKeyedUnarchiver.unarchiveObject(with: data) as? [Int: Any] {
             NSLog("%@", "unarchived: \(rawData)")
             OperationQueue.main.addOperation {
-                self.delegate?.dataChanged(manager: self, data: rawData,
+                self.delegate?.eventRecieved(manager: self, event: rawData,
                                            fromPeer: peerID.displayName)
             }
         } else {
@@ -139,7 +143,7 @@ extension ConnectionManager : StreamDelegate {
                         let position = SCNVector3(fromBytes: Array(bytes[0..<12]))
                         let eulers = SCNVector3(fromBytes: Array(bytes[12..<24]))
                     
-                        self.delegate?.dataChanged(manager: self,
+                        self.delegate?.updateFromStream(manager: self,
                                                    data: [.location: position,
                                                           .eulers : eulers],
                                                    fromPeer: sender.displayName)

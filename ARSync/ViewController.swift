@@ -10,12 +10,6 @@ import UIKit
 import SceneKit
 import ARKit
 
-typealias Message = String
-extension Message {
-    static let location = "location"
-    static let eulers = "eulers"
-}
-
 class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
@@ -53,6 +47,11 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         sceneView.session.pause()
     }
     
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+//        let data = [.addNode: anchor]
+//        connection.sendEvent(data: )
+    }
+    
     func session(_ session: ARSession, didFailWithError error: Error) {
         
     }
@@ -72,13 +71,15 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     
     func broadcastMyLocation() {
         if let pov = sceneView.pointOfView, counter % 2 == 0 {
-            connection.send(data: [.location : pov.position,
+            connection.sendToStreams(data: [.location : pov.position,
                                    .eulers : pov.eulerAngles])
         }
     }
     
     var counter = 0
 }
+
+
 
 extension ViewController: ConnectionManagerDelegate {
     func connectedDevicesChanged(manager: ConnectionManager, connectedDevices: [String]) {
@@ -93,7 +94,11 @@ extension ViewController: ConnectionManagerDelegate {
         }
     }
     
-    func dataChanged(manager: ConnectionManager, data: [String : Any], fromPeer: String) {
+    func dataChanged(manager: ConnectionManager, data: [Int : Any], fromPeer: String) {
+        
+    }
+    
+    func updateFromStream(manager: ConnectionManager, data: [Int : Any], fromPeer: String) {
         if let location = data[.location] as? SCNVector3,
             let eulers = data[.eulers] as? SCNVector3 {
             if let node = sceneView.scene.rootNode.childNode(withName: fromPeer,
@@ -105,6 +110,11 @@ extension ViewController: ConnectionManagerDelegate {
             }
         }
     }
+    
+    func eventRecieved(manager: ConnectionManager, event: [Int : Any], fromPeer: String) {
+        
+    }
+    
     
     func addNodeForDevice(_ device: String, position: SCNVector3? = nil) {
         let node = SCNNode()
