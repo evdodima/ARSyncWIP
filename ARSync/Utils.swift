@@ -9,15 +9,21 @@
 import Foundation
 import ARKit
 
-typealias Message = Int
-extension Message {
-    static let location = 0
-    static let eulers = 1
-    static let addNode = 2
-    static let updateNode = 3
-    static let removeNode = 4
+//typealias Message = Int
+//extension Message {
+//    static let location = 0
+//    static let eulers = 1
+//    static let addNode = 2
+//    static let updateNode = 3
+//    static let removeNode = 4
+//}
 
-
+enum Message: Int {
+    case location
+    case eulers
+    case addNode
+    case updateNode
+    case removeNode
 }
 
 func fromByteArray<T>(_ value: [UInt8], _: T.Type) -> T {

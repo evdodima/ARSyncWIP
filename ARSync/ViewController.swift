@@ -100,7 +100,7 @@ extension ViewController: ConnectionManagerDelegate {
         
     }
     
-    func updateFromStream(manager: ConnectionManager, data: [Int : Any], fromPeer: String) {
+    func updateFromStream(manager: ConnectionManager, data: [Message : Any], fromPeer: String) {
         if let location = data[.location] as? SCNVector3,
             let eulers = data[.eulers] as? SCNVector3 {
             if let node = sceneView.scene.rootNode.childNode(withName: fromPeer,

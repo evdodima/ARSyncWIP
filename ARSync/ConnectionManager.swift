@@ -49,7 +49,7 @@ class ConnectionManager : NSObject {
         self.serviceAdvertiser.stopAdvertisingPeer()
         self.serviceBrowser.stopBrowsingForPeers()
     }
-    func sendToStreams(data: [Int:Any]) {
+    func sendToStreams(data: [Message:Any]) {
         
         NSLog("%@", "sending data: \(data) to \(session.connectedPeers.count) peers")
         

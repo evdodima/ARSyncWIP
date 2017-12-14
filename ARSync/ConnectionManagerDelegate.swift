@@ -12,5 +12,5 @@ protocol ConnectionManagerDelegate {
     
     func eventRecieved(manager : ConnectionManager, event: Event, fromPeer: String)
     
-    func updateFromStream(manager : ConnectionManager, data: [Int: Any], fromPeer: String)
+    func updateFromStream(manager : ConnectionManager, data: [Message: Any], fromPeer: String)
 }
