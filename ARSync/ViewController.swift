@@ -14,6 +14,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
 
     @IBOutlet var sceneView: ARSCNView!
     
+    @IBOutlet weak var pricel: UIImageView!
     @IBOutlet weak var connectedDevicesLabel: UILabel!
     
     let connection = ConnectionManager()
@@ -30,6 +31,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         sceneView.debugOptions = [ARSCNDebugOptions.showWorldOrigin]
     
         sceneView.scene = SCNScene(named: "art.scnassets/ship.scn")!
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tap))
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func tap(tapGesture: UITapGestureRecognizer) {
+        pricel.isHidden = !pricel.isHidden
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -37,6 +45,12 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
+        guard var referenceImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Resources", bundle: nil) else {
+            fatalError("Missing expected asset catalog resources.")
+        }
+        
+        
+        configuration.detectionImages = referenceImages
         
 
         // Run the view's session
@@ -63,8 +77,32 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
                                                              rotation: node.eulerAngles
             ))
             connection.sendEvent(event: event)
+        } else if let anchor = anchor as? ARImageAnchor,
+            let name = connection.session.connectedPeers.first?.displayName,
+            let red = sceneView.scene.rootNode.childNode(withName: name, recursively: false) {
+            
+            let qr = SCNNode()
+            qr.transform = SCNMatrix4(anchor.transform)
+            
+//            let rotation = SCNMatrix4MakeRotation(red.eulerAngles.y + qr.eulerAngles.y,
+//                                                  0, 1, 0)
+            let rotnod = SCNNode()
+            rotnod.eulerAngles.y = qr.eulerAngles.y - red.eulerAngles.y
+            print(qr.eulerAngles.y / Float.pi * 180)
+            print(red.eulerAngles.y / Float.pi * 180, "\n")
+
+//            sceneView.session.setWorldOrigin(relativeTransform: matrix_float4x4(rotnod.transform))
+            
+            let translation = SCNMatrix4MakeTranslation(qr.position.x - red.position.x,
+                                                        qr.position.y - red.position.y,
+                                                        qr.position.z - red.position.z)
+            
+//            sceneView.session.setWorldOrigin(relativeTransform: matrix_float4x4(translation))
+            
+            sceneView.session.remove(anchor: anchor)
+            
+         //   connection.sendEvent(event: <#T##Event#>)
         }
-        
 
     }
     
@@ -99,9 +137,15 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
 
 extension ViewController: ConnectionManagerDelegate {
     
+    func didSyncWorld(manager: ConnectionManager) {
+        DispatchQueue.main.async {
+            self.pricel.isHidden = true
+        }
+    }
+    
     
     func connectedDevicesChanged(manager: ConnectionManager, connectedDevices: [String]) {
-        print(connectedDevices)
+//        print(connectedDevices)
         connectedDevicesLabel.text = connectedDevices.description
         
         for device in connectedDevices {

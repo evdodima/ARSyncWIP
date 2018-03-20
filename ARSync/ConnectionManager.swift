@@ -33,6 +33,15 @@ class ConnectionManager : NSObject {
     var queues: [MCPeerID : OperationQueue] = [:]
     var outputStreams: [MCPeerID : OutputStream] = [:]
     var inputStreams: [MCPeerID : InputStream] = [:]
+    var synced: Bool = false {
+        didSet {
+            if synced {
+                self.delegate?.didSyncWorld(manager: self)
+            } else {
+                // invalidate (show QR code again)
+            }
+        }
+    }
     
     override init() {
         self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: serviceType)
@@ -50,8 +59,8 @@ class ConnectionManager : NSObject {
         self.serviceBrowser.stopBrowsingForPeers()
     }
     func sendToStreams(data: [Message:Any]) {
-        
-        NSLog("%@", "sending data: \(data) to \(session.connectedPeers.count) peers")
+//        
+//        NSLog("%@", "sending data: \(data) to \(session.connectedPeers.count) peers")
         
         for (id, stream) in outputStreams {
             if let location = data[.location] as? SCNVector3,
@@ -69,7 +78,7 @@ class ConnectionManager : NSObject {
     let decoder = JSONDecoder()
     
     func sendEvent(event: Event) {
-        NSLog("%@", "sending data: \(event) to \(session.connectedPeers.count) peers")
+//        NSLog("%@", "sending data: \(event) to \(session.connectedPeers.count) peers")
         
         if session.connectedPeers.count > 0 {
             do {
@@ -90,6 +99,11 @@ extension ConnectionManager : MCSessionDelegate {
         NSLog("%@", "peer \(peerID) didChangeState: \(state)")
         
         if state == .connected {
+            if peerID.displayName > myPeerId.displayName {
+                synced = true
+            }
+            
+                
             let id = "\(myPeerId.displayName)-\(peerID.displayName)"
             if let stream = try? session.startStream(withName: id, toPeer: peerID) {
                 stream.schedule(in: RunLoop.main, forMode: .defaultRunLoopMode)
@@ -115,7 +129,7 @@ extension ConnectionManager : MCSessionDelegate {
             let event = try decoder.decode(Event.self, from: data)
             NSLog("%@", "unarchived: \(event)")
             OperationQueue.main.addOperation {
-                debugPrint(event)
+//                debugPrint(event)
                 self.delegate?.eventRecieved(manager: self, event: event, fromPeer: peerID.displayName)
             }
         } catch let error {
@@ -152,6 +166,9 @@ extension ConnectionManager : StreamDelegate {
                     
                         var bytes = [UInt8](repeating: 0, count: 256)
                         let len = input.read(&bytes, maxLength: 256)
+                    
+                        if len < 24 { return }
+                    
                         bytes = Array(bytes[len-24..<len])
                     
                         let position = SCNVector3(fromBytes: Array(bytes[0..<12]))
@@ -175,6 +192,7 @@ extension ConnectionManager : MCNearbyServiceAdvertiserDelegate {
     
     func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         NSLog("%@", "didReceiveInvitationFromPeer \(peerID)")
+        
         invitationHandler(true, self.session)
     }
     
