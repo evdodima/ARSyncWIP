@@ -26,6 +26,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         
         sceneView.delegate = self
         sceneView.showsStatistics = true
+        
+        sceneView.debugOptions = [ARSCNDebugOptions.showWorldOrigin]
     
         sceneView.scene = SCNScene(named: "art.scnassets/ship.scn")!
     }
@@ -35,6 +37,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
         
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
+        
 
         // Run the view's session
         sceneView.session.run(configuration)
@@ -48,8 +51,21 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     }
     
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
-//        let data = [.addNode: anchor]
-//        connection.sendEvent(data: )
+        if let anchor = anchor as? ARPlaneAnchor {
+            node.name = connection.myPeerId.displayName + UUID().uuidString
+            let event = Event(type: .added, node: ARSyncNode(id: node.name!,
+                                                             geo:
+                                                                ARSyncGeo(
+                                                                    type: .horPlane,
+                                                                    width: anchor.extent.x,
+                                                                    height: anchor.extent.z),
+                                                             position: node.position,
+                                                             rotation: node.eulerAngles
+            ))
+            connection.sendEvent(event: event)
+        }
+        
+
     }
     
     func session(_ session: ARSession, didFailWithError error: Error) {

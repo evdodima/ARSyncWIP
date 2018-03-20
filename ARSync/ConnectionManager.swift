@@ -16,7 +16,7 @@ class ConnectionManager : NSObject {
     // and can contain only ASCII lowercase letters, numbers and hyphens.
     private let serviceType = "arsync"
     
-    private let myPeerId = MCPeerID(displayName: UIDevice.current.name)
+    public let myPeerId = MCPeerID(displayName: UIDevice.current.name) 
     private let serviceAdvertiser : MCNearbyServiceAdvertiser
     private let serviceBrowser : MCNearbyServiceBrowser
     

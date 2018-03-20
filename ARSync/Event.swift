@@ -32,7 +32,7 @@ struct ARSyncGeo: Codable {
 }
 
 struct ARSyncNode: Codable {
-    let id: Int
+    let id: String
     let geo: ARSyncGeo
     let position: SCNVector3
     let rotation: SCNVector3
