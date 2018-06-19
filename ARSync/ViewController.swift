@@ -120,15 +120,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, ARSessionDelegate {
     
     func session(_ session: ARSession, didUpdate frame: ARFrame) {
         counter += 1
-        broadcastMyLocation()
+        connection.broadcastMyLocation(pov: sceneView.pointOfView!)
     }
     
-    func broadcastMyLocation() {
-        if let pov = sceneView.pointOfView, counter % 2 == 0 {
-            connection.sendToStreams(data: [.location : pov.position,
-                                   .eulers : pov.eulerAngles])
-        }
-    }
+    
     
     var counter = 0
 }

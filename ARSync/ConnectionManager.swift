@@ -91,6 +91,10 @@ class ConnectionManager : NSObject {
         }
         
     }
+    func broadcastMyLocation(pov: SCNNode) {
+            sendToStreams(data: [.location : pov.position,
+                                            .eulers : pov.eulerAngles])
+    }
 }
 
 extension ConnectionManager : MCSessionDelegate {
